@@ -1,0 +1,68 @@
+services:
+  web:
+    # Nginx → routing, static file.
+    restart: unless-stopped
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php_1
+      - php_2
+      - php_3
+      - php_4
+
+  php_1:
+    #PHP-FPM → eksekusi kode
+    restart: unless-stopped
+    build: ./svc_bestdistributor
+    volumes:
+      - ./src:/var/www/html
+
+  php_2:
+    #PHP-FPM → eksekusi kode
+    restart: unless-stopped
+    build: ./svc_bestdistributor
+    volumes:
+      - ./src:/var/www/html
+
+  php_3:
+    #PHP-FPM → eksekusi kode
+    restart: unless-stopped
+    build: ./svc_bestdistributor
+    volumes:
+      - ./src:/var/www/html
+
+  php_4:
+    #PHP-FPM → eksekusi kode
+    restart: unless-stopped
+    build: ./svc_bestdistributor
+    volumes:
+      - ./src:/var/www/html
+
+  phpmyadmin:
+    restart: unless-stopped
+    image: phpmyadmin
+    environment:
+      PMA_HOSTS: db_bestdistributor
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 1G
+    depends_on:
+      - db_bestdistributor
+
+  db_bestdistributor:
+    #MySQL → database.
+    restart: unless-stopped
+    image: mariadb:10.5
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_bestdistributor_data:/var/lib/mysql
+
+volumes:
+  db_bestdistributor_data:
