@@ -6,45 +6,30 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./src:/var/www/html
+      - ./app_bestdistributor:/var/www/html
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
-      - php_1
-      - php_2
-      - php_3
-      - php_4
+      - php
 
-  php_1:
+  php:
     #PHP-FPM → eksekusi kode
     restart: unless-stopped
     build: ./svc_bestdistributor
     volumes:
-      - ./src:/var/www/html
-
-  php_2:
-    #PHP-FPM → eksekusi kode
-    restart: unless-stopped
-    build: ./svc_bestdistributor
-    volumes:
-      - ./src:/var/www/html
-
-  php_3:
-    #PHP-FPM → eksekusi kode
-    restart: unless-stopped
-    build: ./svc_bestdistributor
-    volumes:
-      - ./src:/var/www/html
-
-  php_4:
-    #PHP-FPM → eksekusi kode
-    restart: unless-stopped
-    build: ./svc_bestdistributor
-    volumes:
-      - ./src:/var/www/html
+      - ./app_bestdistributor:/var/www/html
+    environment:
+      ACC_DB_HOST: ${DB_HOST}
+      ACC_DB_DATABASE: ${DB_DATABASE}
+      ACC_DB_USER: ${DB_USER}
+      ACC_DB_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      - db_bestdistributor
 
   phpmyadmin:
     restart: unless-stopped
     image: phpmyadmin
+    ports: 
+       - "8081:80"
     environment:
       PMA_HOSTS: db_bestdistributor
       PMA_PORT: 3306
@@ -56,6 +41,10 @@ services:
     #MySQL → database.
     restart: unless-stopped
     image: mariadb:10.5
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}

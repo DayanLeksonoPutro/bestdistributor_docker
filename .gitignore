@@ -1,0 +1,6 @@
+# macOS
+.DS_Store
+# Environment variables
+.env
+# Docker
+db_bestdistributor_data/
